@@ -1,2 +1,12 @@
 # kenyantutors
-Source code and development changelogs for KenyanTutors.com — an educational group chat platform connecting Kenyan students with volunteer tutors. This repository includes custom alterations to original source scripts, AWS configuration notes (S3, IAM, CloudFront, etc.), and tracked changes made to both frontend and backend components.
+This repository contains all custom alterations and additions made to the proprietary GrupoChat script, which powers KenyanTutors.com — a group chat and tutoring support platform for Kenyan students.
+
+It includes:
+
+Custom modifications to the GrupoChat source code specifically for KenyanTutors.com
+
+New features, bug fixes, and UI changes
+
+Detailed AWS infrastructure notes (S3, IAM, CloudFront, EC2)
+
+Versioned changelogs for both code and cloud infrastructure updates
