@@ -1,5 +1,5 @@
 # kenyantutors
-This repository contains all custom alterations and additions made to the proprietary GrupoChat script, which powers KenyanTutors.com — a group chat and tutoring support platform for Kenyan students.
+This repository contains all custom alterations and additions made to the proprietary Grupo Chat script, which powers KenyanTutors.com — a group chat and tutoring support platform for Kenyan students.
 
 It includes:
 
