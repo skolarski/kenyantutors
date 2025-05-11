@@ -1,0 +1,72 @@
+📌 Issue Summary
+After upgrading the Grupo chat script to v3.10 and migrating EC2 instances, image and file uploads to Amazon S3 stopped working.
+
+While all environment credentials and IAM permissions were correct, uploaded files were not appearing in the bucket, and no error was shown in the frontend. Debugging the s3_compatible.php script revealed AWS was rejecting putObject requests with an HTTP 400 Bad Request.
+
+🧪 Symptoms
+No new files appeared in the S3 bucket.
+
+Manually uploading via the AWS CLI from the EC2 instance succeeded.
+
+Debug logging added in /var/www/html/virtualtrix/public_html/fns/cloud_storage/s3_compatible.php showed this error:
+
+AWS HTTP error: Client error: `PUT https://s3.eu-west-2.amazonaws.com/...` resulted in a `400 Bad Request` response:
+<Error>
+  <Code>AccessControlListNotSupported</Code>
+  <Message>The bucket does not allow ACLs</Message>
+</Error>
+
+🧭 Root Cause
+The AWS SDK putObject() request included this parameter:
+'ACL' => 'public-read',
+However, the S3 bucket had Object Ownership set to "Bucket owner enforced", which disables all use of ACLs. This feature is enabled by default for new S3 buckets created after April 2023.
+
+AWS will return a 400 error if any ACLs (like public-read) are provided in this context.
+
+🧰 Solution
+Remove the 'ACL' => 'public-read' entry from the $s3->putObject() call in s3_compatible.php.
+
+🔧 Modified file:
+/var/www/html/virtualtrix/public_html/fns/cloud_storage/s3_compatible.php
+🧾 Original lines (lines 86–92 approx):
+
+$s3->putObject(array(
+    'Bucket' => $storage_info['bucket_name'],
+    'Key' => $data['upload_file'],
+    'Body' => fopen($data['upload_file'], 'r+'),
+    'ACL' => 'public-read',
+    'CacheControl' => 'max-age=3153600'
+));
+
+✅ Fixed lines:
+$s3->putObject(array(
+    'Bucket' => $storage_info['bucket_name'],
+    'Key' => $data['upload_file'],
+    'Body' => fopen($data['upload_file'], 'r+'),
+    'CacheControl' => 'max-age=3153600'
+));
+
+🧪 Verification Steps
+Modified file saved and deployed using:
+
+aws s3 cp s3_compatible.php s3://kenyantuts-store/s3_compatible.php
+sudo aws s3 cp s3://kenyantuts-store/s3_compatible.php /var/www/html/virtualtrix/public_html/fns/cloud_storage/s3_compatible.php
+
+Uploaded a profile picture via the web interface.
+
+Log file /var/www/html/virtualtrix/public_html/fns/cloud_storage/upload_log.txt confirmed upload attempt.
+
+File now visible in the S3 bucket under the correct path.
+
+✅ Resolution
+This issue is now resolved by removing the deprecated ACL parameter to comply with current S3 bucket ownership enforcement settings.
+
+📝 Recommendation
+Do not use the ACL option in future scripts if your bucket is configured with “Bucket owner enforced.” All access control should instead be managed through bucket policies and IAM roles.
+
+
+
+
+
+
+
