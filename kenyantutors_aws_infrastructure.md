@@ -61,7 +61,7 @@ fns/cloud_storage/s3_compatible.php
 ## 🔹 6. Email & Notifications
 - **SMTP**: Emails sent from server using SMTP, configured in PHP
 - **SNS Topic**: `rds-alarms` for operational alerts
-  - Subscribed email: `marcsarin123@gmail.com`
+  - Subscribed email: [email hidden]
 
 ---
 
